@@ -1,0 +1,89 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\giord\\OneDrive\\Desktop\\SEGUNDO A\u00D1O PROGRAMACION\\Probando MVC\\CryptoWallet.API\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{716486FA-F321-4BE9-A99D-B81FEF4B673A}|CryptoWallet.API.csproj|c:\\users\\giord\\onedrive\\desktop\\segundo a\u00F1o programacion\\probando mvc\\cryptowallet.api\\responses\\cryptoyaresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{716486FA-F321-4BE9-A99D-B81FEF4B673A}|CryptoWallet.API.csproj|solutionrelative:responses\\cryptoyaresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{716486FA-F321-4BE9-A99D-B81FEF4B673A}|CryptoWallet.API.csproj|c:\\users\\giord\\onedrive\\desktop\\segundo a\u00F1o programacion\\probando mvc\\cryptowallet.api\\models\\dtos\\transactiondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{716486FA-F321-4BE9-A99D-B81FEF4B673A}|CryptoWallet.API.csproj|solutionrelative:models\\dtos\\transactiondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{716486FA-F321-4BE9-A99D-B81FEF4B673A}|CryptoWallet.API.csproj|c:\\users\\giord\\onedrive\\desktop\\segundo a\u00F1o programacion\\probando mvc\\cryptowallet.api\\models\\cryptotransaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{716486FA-F321-4BE9-A99D-B81FEF4B673A}|CryptoWallet.API.csproj|solutionrelative:models\\cryptotransaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{716486FA-F321-4BE9-A99D-B81FEF4B673A}|CryptoWallet.API.csproj|c:\\users\\giord\\onedrive\\desktop\\segundo a\u00F1o programacion\\probando mvc\\cryptowallet.api\\controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{716486FA-F321-4BE9-A99D-B81FEF4B673A}|CryptoWallet.API.csproj|solutionrelative:controllers\\transactionscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CryptoYaResponse.cs",
+              "DocumentMoniker": "C:\\Users\\giord\\OneDrive\\Desktop\\SEGUNDO A\u00D1O PROGRAMACION\\Probando MVC\\CryptoWallet.API\\Responses\\CryptoYaResponse.cs",
+              "RelativeDocumentMoniker": "Responses\\CryptoYaResponse.cs",
+              "ToolTip": "C:\\Users\\giord\\OneDrive\\Desktop\\SEGUNDO A\u00D1O PROGRAMACION\\Probando MVC\\CryptoWallet.API\\Responses\\CryptoYaResponse.cs",
+              "RelativeToolTip": "Responses\\CryptoYaResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-26T19:16:42.012Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TransactionDto.cs",
+              "DocumentMoniker": "C:\\Users\\giord\\OneDrive\\Desktop\\SEGUNDO A\u00D1O PROGRAMACION\\Probando MVC\\CryptoWallet.API\\Models\\DTOs\\TransactionDto.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\TransactionDto.cs",
+              "ToolTip": "C:\\Users\\giord\\OneDrive\\Desktop\\SEGUNDO A\u00D1O PROGRAMACION\\Probando MVC\\CryptoWallet.API\\Models\\DTOs\\TransactionDto.cs",
+              "RelativeToolTip": "Models\\DTOs\\TransactionDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-22T01:02:54.446Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CryptoTransaction.cs",
+              "DocumentMoniker": "C:\\Users\\giord\\OneDrive\\Desktop\\SEGUNDO A\u00D1O PROGRAMACION\\Probando MVC\\CryptoWallet.API\\Models\\CryptoTransaction.cs",
+              "RelativeDocumentMoniker": "Models\\CryptoTransaction.cs",
+              "ToolTip": "C:\\Users\\giord\\OneDrive\\Desktop\\SEGUNDO A\u00D1O PROGRAMACION\\Probando MVC\\CryptoWallet.API\\Models\\CryptoTransaction.cs",
+              "RelativeToolTip": "Models\\CryptoTransaction.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-21T22:48:13.741Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TransactionsController.cs",
+              "DocumentMoniker": "C:\\Users\\giord\\OneDrive\\Desktop\\SEGUNDO A\u00D1O PROGRAMACION\\Probando MVC\\CryptoWallet.API\\Controllers\\TransactionsController.cs",
+              "RelativeDocumentMoniker": "Controllers\\TransactionsController.cs",
+              "ToolTip": "C:\\Users\\giord\\OneDrive\\Desktop\\SEGUNDO A\u00D1O PROGRAMACION\\Probando MVC\\CryptoWallet.API\\Controllers\\TransactionsController.cs",
+              "RelativeToolTip": "Controllers\\TransactionsController.cs",
+              "ViewState": "AgIAADYAAAAAAAAAAAAgwFwAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-21T16:07:51.632Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
