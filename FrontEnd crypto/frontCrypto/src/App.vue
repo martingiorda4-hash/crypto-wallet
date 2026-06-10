@@ -1,73 +1,14 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-
-import {
-        HomeIcon,
-        ShoppingCartIcon,
-        ArrowsRightLeftIcon,
-        ClockIcon,
-        CurrencyDollarIcon,
-        ArrowLeftStartOnRectangleIcon,
-        DocumentCurrencyDollarIcon
-    } from '@heroicons/vue/24/solid'
+// import { RouterLink, RouterView } from 'vue-router'
+import menuLateral from './components/menuLateral.vue';  
 </script>
 
 <template>
-  
-    
-    <div class="contenedor-general">
-      <div class="dashboard">
-        <div class="logoApp">
-          <div class="contenedor-icono">
-            <DocumentCurrencyDollarIcon></DocumentCurrencyDollarIcon>
-          </div>
-          <span>Crypto Wallet</span>
-        </div>
-
-        <div class="btnDashboard">
-          <RouterLink to="/" class="btn">
-            <div class="contenedor-icono">
-              <HomeIcon class="icon"/>
-            </div>
-            <sapan>Inicio</sapan>
-          </RouterLink>
-        </div>
-
-        <div class="btnDashboard">
-          <RouterLink to="/Operaciones" class="btn">
-            <div class="contenedor-icono">
-              <ShoppingCartIcon class="icon"/>
-            </div>
-            <span>Operaciones</span>
-          </RouterLink>
-
-          <div class="btnDashboard">
-            <RouterLink to="/Historial" class="btn">
-              <div class="contenedor-icono">
-                <ClockIcon class="icon"/>
-              </div>
-              <span>Historial</span>
-            </RouterLink>
-
-            <div class="btnDashboard">
-              <button class="btn" id="btnSalir">
-                <div class="contenedor-icono">
-                  <ArrowLeftStartOnRectangleIcon></ArrowLeftStartOnRectangleIcon>
-                </div>
-                <span>Salir</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      
-    </div>
-
-  <RouterView />
+  <menuLateral></menuLateral>
 </template>
 
 <style scoped>
+/* header {
 header{
   background-color: #1a1a2e;
   margin: 20px auto;
@@ -100,7 +41,6 @@ nav a{
 nav a:hover{
   color:white;
 }
-/* header {
   line-height: 1.5;
   max-height: 100vh;
 }

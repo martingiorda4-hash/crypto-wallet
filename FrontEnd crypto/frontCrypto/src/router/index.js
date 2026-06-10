@@ -18,6 +18,11 @@ const router = createRouter({
       name: 'Historial',
       component: () => import('../components/TransactionsHistorial.vue'),
     },
+    {
+      path: '/EstadoActual',
+      name: 'EstadoActual',
+      component: () => import('../components/EstadoActual.vue'),
+    },
   ],
 })
 

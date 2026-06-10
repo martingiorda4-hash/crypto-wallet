@@ -1,29 +1,43 @@
 <template>
     <div>
-    <h1 style="margin-top: 10px; margin-left: 8px;">Tus movimientos</h1>
+    <h1 style="margin-top: 10px; margin-left: 8px;">Historial de movimientos</h1>
     <table class="table-transacciones">
     <thead>
         <tr>
-        <th>Accion</th>
-        <th>Crypto</th>
-        <th>Cantidad</th>
         <th>Fecha</th>
-        <th>Monto</th>
-        <th>Gestión</th>
+        <th>Tipo</th>
+        <th>Criptomoneda</th>
+        <th>Cantidad</th>
+        <th>Monto(ARS)</th>
+        <th>Acciones</th>
         </tr>
     </thead>
     <tbody v-if="!loading">        
 
         <tr v-for="transaction in movimientos" :key="transaction.id">
-            <td>{{ transaction.action === 'purchase' ? 'Compra' : 'Venta' }}</td>
+            <td>{{ new Date(transaction.dateTime).toLocaleString() }}</td>
+            <td>
+                <span :class="transaction.action === 'purchase' ? 'compra' : 'venta'" >
+                    {{ transaction.action === 'purchase' ? 'Compra' : 'Venta' }}
+                </span>
+            </td>
+
+
             <td>{{ transaction.cryptoCode }}</td>
             <td>{{ transaction.cryptoAmount }}</td>
-            <td>{{ new Date(transaction.dateTime).toLocaleString() }}</td>
             <td>{{ transaction.money.toLocaleString('es-AR', {style: 'currency', currency: 'ARS'})}}</td>
             <td>
-            <button id="ver" @click="verTransaccion(transaction.id)">Ver</button>
-            <button id="editar" @click="editarTransaccion(transaction.id)">Editar</button>
-            <button id="eliminar" @click="abrirModal(transaction.id)">Eliminar</button>
+            <button  id="ver" @click="verTransaccion(transaction.id)">
+                <i class="fa-solid fa-eye"></i>
+            </button>
+            <button id="editar" @click="editarTransaccion(transaction.id)">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button id="eliminar" @click="abrirModal(transaction.id)">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+
+
             </td>
         </tr>
     </tbody>
@@ -94,23 +108,55 @@ const cancelarEliminar = () => {
 
 <style scoped>
 .table-transacciones {
-    width: 100%;
+    width: 80%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 15px;
+    background: #0f2233;
+    border-radius: 10px;
+    overflow: hidden;   
+    padding-left: 20px;
+}
+div{
+    padding-left: 20px;
 }
 .table-transacciones th{
-    background-color: #1a1a2e;
-    color: #FFD700;
-    padding: 10px;
-    text-align: left;
+    background-color: #162a40;
+    color: white;
+    padding: 12px;
+    text-align: center;
 }
 .table-transacciones td {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #1e3a5f;
     padding: 10px;
+    text-align: center;
+    color: #ddd;
 }
 .table-transacciones tr:hover td {
     background-color: #111128;
     color: #00ff88;
+}
+.compra{
+    
+    background-color: rgba(40, 167, 69, 0.15); 
+    color: #4ade80; 
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+
+}
+.venta{
+    
+    background-color: rgba(220, 53, 69, 0.15);
+    color: #f87171; 
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+
+
 }
 button#editar{
     background-color: #1a1a2e;

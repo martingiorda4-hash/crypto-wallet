@@ -1,50 +1,86 @@
 <template>
     <div class="container">
-
-        <div class="card">
             <h1 style="margin-top: 10px; margin-left: 8px;">Nueva transacción</h1>
-            <form @submit.prevent="CrearTransaccion">
-                <select v-model="accion">
+            <form class="form" @submit.prevent="CrearTransaccion">
+                <h3 class="titulo">Datos de la transaccion</h3>
+            <div class="input">
+                <h3>Acción</h3>
+                <select class="inputForm" v-model="accion" required>
                     <option value="">Seleccione una accion</option>
                     <option value="purchase">compra</option>
                     <option value="sale">venta</option>
                 </select>
-                <select v-model="cryptoSeleccionada">
+            </div>
+            <div class="input">
+                <h3>Criptomoneda</h3>
+                <select class="inputForm" v-model="cryptoSeleccionada" required>
                     <option value="">Seleccione una criptomoneda</option>
                     <option v-for="crypto in cryptos" :key="crypto.id" :value="crypto.code" >
                         {{ crypto.name }}   
                     </option>
                 </select>
-                <input v-model="cantidadCrypto" type="number" step="0.00000001" placeholder="Cantidad de crypto"/>
-                <input  v-model="money" v-if="accion === 'sale'" type="number" placeholder="Cantidad cobrada"/>
+
+                <div v-if="accion === 'sale' && cryptoSeleccionada" class="disponible">
+                    Disponible: {{ disponible }} {{ cryptoSeleccionada }}
+
+                </div>
+            </div>
+            <div class="input">
+                <h3>Cantidad</h3>
+                <input class="inputForm" v-model="cantidadCrypto" type="number" step="0.00000001" placeholder="0.00"/>
+            </div>
+            <div class="resultado" v-if="accion === 'sale'">
+                <label>Monto a cobrar (ARS)</label>
+                <p>
+                    {{ total.toLocaleString('es-AR', {
+                        style: 'currency',
+                        currency: 'ARS'
+                    })}}
+                </p>
+            </div>
+
                 <p v-if="loading">Consultando precio...</p>
-                <button v-if="accion === 'purchase' && !loading" type="submit">Comprar</button>
-                <button v-if="accion === 'sale' && !loading" type="submit">Vender</button>
+                <div class="botones">
+                    <button  v-if="accion === 'purchase' && !loading" type="submit">Comprar</button>
+                    <button  v-if="accion === 'sale' && !loading" type="submit">Vender</button>
+                </div>
+
             </form>
             <p v-if="exito" style="color: green;">{{ exito }}</p>
         </div>
-    </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
+import { watch } from 'vue'
 
 const accion = ref('')
 const cryptos = ref([])
 const cryptoSeleccionada = ref('')
-const cantidadCrypto = ref('')
-const money = ref('')
+const cantidadCrypto = ref(0)
+const precio = ref(0)
+const total = computed(() => parseFloat(cantidadCrypto.value || 0) * parseFloat(precio.value || 0));
 const exito = ref(null)
 const loading = ref(false)
+const estado = ref([])
+const disponible = computed(() => { 
+    if(!estado.value || !estado.value.length)return 0;
+
+    const seleccionado = cryptoSeleccionada.value.trim().toLocaleLowerCase();
+
+    const encontrado = estado.value.find(c => c.cryptoCode.toLocaleLowerCase() === cryptoSeleccionada.value.toLocaleLowerCase());
+
+    return encontrado ? encontrado.cantidad : 0;
+});
 
 const CrearTransaccion = async () => {
-    if(!accion.value || !cryptoSeleccionada.value || !cantidadCrypto.value || !fecha.value){
+    if(!accion.value || !cryptoSeleccionada.value || !cantidadCrypto.value){
         alert('Por favor complete todos los campos')
         return
     }
-    if(accion.value === 'sale' && !money.value){
-        alert('Por favor ingrese la cantidad cobrada')
+    if(accion.value === 'sale' && total.value <= 0){
+        alert('Monto inválido')
         return
     }
     if(parseFloat(cantidadCrypto.value) <= 0){
@@ -57,13 +93,12 @@ const CrearTransaccion = async () => {
             action: accion.value,
             cryptoCode: cryptoSeleccionada.value,
             cryptoAmount: parseFloat(cantidadCrypto.value) || 0,
-            money: accion.value === 'sale' ? parseFloat(money.value) : 0
+            money: accion.value === 'sale' ? parseFloat(total.value) : 0
         })
         exito.value = 'Transacción creada exitosamente' + response.data
         accion.value = ''
         cryptoSeleccionada.value = ''
         cantidadCrypto.value = ''
-        money.value = ''
     }catch(err){
         if(err.response && err.response.data){
             alert(err.response.data)        }
@@ -84,50 +119,129 @@ onMounted(async () => {
         alert('Error al cargar las criptomonedas' + err.message)
     }
 })
+
+onMounted(async () => {
+
+        const response = await axios.get('https://localhost:7233/api/Transactions/estado');
+
+        estado.value = response.data.cryptos;
+
+        console.log("Estado cargado:", estado.value);
+});
+
+watch(cryptoSeleccionada, async (nuevaCrypto) =>{
+    if(!nuevaCrypto)return;
+
+    try{
+        loading.value =true;
+
+        const response = await axios.get(`https://localhost:7233/api/Transactions/precio/${nuevaCrypto}`);
+        
+        console.log("Respuesta API:", response.data);
+
+        precio.value = parseFloat(response.data.precio);
+
+        console.log("Precio guardado:", precio.value);
+    }catch(error){
+        alert("Error al obtener precio"+ error.message);
+    }
+    finally{
+        loading.value = false;
+    }
+});
+
 </script>
 
 
 
 <style scoped>
 .container{
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    width: 100%;
-    box-shadow: border-box ;
-    margin-top: 100px;
-}
-.card{
-    background-color: #242323;
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 400px;
-    max-width: 90%;           /* Evita que la tarjeta se corte en pantallas de celulares */
-    box-sizing: border-box; 
-    
+    padding: 40px;
 }
 form {
-display: flex;
-flex-direction: column;
-gap: 15px;
+    width: 60%;
+    height: 90;
+    border: 3px solid #293643;
+    border-radius: 10px;
+    background-color: #1a252d;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
 }
-input, select, button {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 10px;
+.input{
+    display: grid;
+    grid-template-areas: 'texto' 'input';
+    margin: 0px 20px 0px 20px;
 }
-button{
-  background-color: green;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 7px;
-  transition: background-color 0.3s ease;
+.titulo{
+    font-size: 25px;
+    margin-left: 20px;
 }
-button:hover {
-  background-color: darkgreen;
-  transform: scale(1.05);
+h3{
+    grid-area: texto;
+    color: #DBDDE7;
+    width: 100%;
+    margin: 0px auto;
+    padding: 20px 0px 5px 0px;
+    font-size: 15px;
+}
+.inputForm{
+    grid-area: input;
+    width: 100%;
+    max-width: 280px;
+    font-size: 15px;
+    padding: 10px;
+    background-color: #0C131A;
+    border: 2px solid #293643;
+    outline: none;
+    color: #DBDDE7;
+    border-radius: 5px;
+}
+.botones{
+    
+    margin-top: 15px;
+    
+}
+.botones button{
+    width: 100%;
+    max-width: 280px;
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    background-color: #1050B8;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-left: 19px;
+    
+}
+.inputForm:invalid{
+    color: #8a9bb0;
+}
+.resultado{
+    margin-top: 15px;
+}
+.resultado p{
+    height: 38px;
+    display: flex;
+    align-items: center;
+    background-color: #0f2233;
+    padding: 8px;
+    border-radius: 6px;
+    color: white;
+    margin-top: 5px;
+    font-size: 14px;
+    width: 57%;
+}
+.disponible{
+    background-color: rgba(37, 99, 235, 0.15); 
+    color:  #60a5fa; 
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    display: inline-block;
+    width: 50%;
+
 }
 </style>
