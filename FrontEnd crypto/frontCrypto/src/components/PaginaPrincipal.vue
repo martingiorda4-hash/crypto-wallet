@@ -2,7 +2,12 @@
     <div class="contendedor-usuario">
         <div class="logoUsuario">
             <UserIcon class="iconUser"></UserIcon>
+            {{ nombreUsuario }}  ({{ role }})
+            <button class="btn-cerrarSesion" type="button" @click="cerrarSesion">
+                Cerrar sesión
+            </button>
         </div>
+
     </div>
     <div class="dashboard-contenedor">
         <h1 class="titulo">Dashboard</h1>
@@ -19,7 +24,7 @@
                 <span>Historial</span>
             </RouterLink>
 
-            <RouterLink to="/Portfolio" class="tarjeta">
+            <RouterLink to="/EstadoActual" class="tarjeta">
                 <CurrencyDollarIcon style="color: green;" class="icon"/>
                 <span>Estado actual</span>
             </RouterLink>
@@ -52,6 +57,18 @@
     
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
+
+const role = ref('')
+const nombreUsuario = ref('')
+
+const cerrarSesion = () => {
+    localStorage.removeItem("role")
+    router.push("/")
+}
+
 
     const cantidadTransacciones = ref(0);
     const totalCartera = ref(0);
@@ -68,7 +85,14 @@ import { onMounted, ref } from 'vue';
         
 
     })  
+    onMounted(async () => {
+        role.value = localStorage.getItem("role")
+        nombreUsuario.value = localStorage.getItem("username")
 
+    if(!role.value){
+        router.push("/")
+    }
+    })
     </script>
 
 
@@ -175,5 +199,28 @@ import { onMounted, ref } from 'vue';
         width: 28px;
         height: 28px;
         color: #D4AF37;
+    }
+    .btn-cerrarSesion{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; 
+    padding: 10px 20px;
+    background-color: #ff4d4f;
+    color: white;
+    font-family: sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 25px; 
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-left: 10px;
+    }
+    .btn-cerrarSesion:hover{
+        background-color: #d9363e;
+        transform: translateY(-2px);
+    }
+    .btn-cerrarSesion:active{
+        transform: translateY(0);
     }
     </style>

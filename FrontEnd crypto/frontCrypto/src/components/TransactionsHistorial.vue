@@ -30,10 +30,10 @@
             <button  id="ver" @click="verTransaccion(transaction.id)">
                 <i class="fa-solid fa-eye"></i>
             </button>
-            <button id="editar" @click="editarTransaccion(transaction.id)">
+            <button v-if="role === 'admin'" id="editar" @click="router.push(`/Operaciones/${transaction.id}`)">
                 <i class="fa-solid fa-pen-to-square"></i>
             </button>
-            <button id="eliminar" @click="abrirModal(transaction.id)">
+            <button v-if="role === 'admin'" id="eliminar" @click="abrirModal(transaction.id)">
                 <i class="fa-solid fa-trash-can"></i>
             </button>
 
@@ -61,7 +61,9 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
+
 const router = useRouter()
+const role = ref('')
 const loading = ref(false)
 const movimientos = ref([])
 const mostrarModal = ref(false)
@@ -82,7 +84,13 @@ onMounted(async () => {
         loading.value = false
     }
 })
+onMounted(async () => {
+    role.value = localStorage.getItem("role")
 
+    if(!role){
+        router.push("/")
+    }
+    })
 const abrirModal = (id) => {
     transaccionEliminar.value = id
     mostrarModal.value = true

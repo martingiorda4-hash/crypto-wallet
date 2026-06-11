@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-            <h1 style="margin-top: 10px; margin-left: 8px;">Nueva transacción</h1>
+            <h1>{{ editando ? 'Actualización de transaccion' : 'Nueva transacción' }}</h1>
             <form class="form" @submit.prevent="CrearTransaccion">
                 <h3 class="titulo">Datos de la transaccion</h3>
             <div class="input">
@@ -41,8 +41,9 @@
 
                 <p v-if="loading">Consultando precio...</p>
                 <div class="botones">
-                    <button  v-if="accion === 'purchase' && !loading" type="submit">Comprar</button>
-                    <button  v-if="accion === 'sale' && !loading" type="submit">Vender</button>
+                    <button  v-if="!esitando && accion === 'purchase' && !loading" type="submit">Comprar</button>
+                    <button  v-if="!editando && accion === 'sale' && !loading" type="submit">Vender</button>
+                    <button v-if="editando && !loading" type="submit">Guardar cambios</button>
                 </div>
 
             </form>
@@ -54,7 +55,10 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { watch } from 'vue'
+import { useRoute } from 'vue-router'
 
+const editando = ref(false)
+const route = useRoute()
 const accion = ref('')
 const cryptos = ref([])
 const cryptoSeleccionada = ref('')
@@ -74,6 +78,20 @@ const disponible = computed(() => {
     return encontrado ? encontrado.cantidad : 0;
 });
 
+// Verifica si está con un rol, sino lo renderiza al componente login
+onMounted(async () => {
+        const role = localStorage.getItem("role")
+
+    if(!role){
+        router.push("/")
+    }
+    })
+//verifica si recibe id para que cambie el titulo en base a si esta editando o creando
+onMounted(async () => {
+    if(route.params.id){
+        editando.value = true
+    }
+})
 const CrearTransaccion = async () => {
     if(!accion.value || !cryptoSeleccionada.value || !cantidadCrypto.value){
         alert('Por favor complete todos los campos')
@@ -110,24 +128,32 @@ const CrearTransaccion = async () => {
         loading.value = false
     }
 }
-
-onMounted(async () => {
+onMounted(async () =>{
     try{
-        const response = await axios.get('https://localhost:7233/api/Transactions/cryptos')
-        cryptos.value = response.data
-    }catch(err){
-        alert('Error al cargar las criptomonedas' + err.message)
+        //1. cargar las cryptos en el select
+        const responseCryptos = await axios.get('https://localhost:7233/api/Transactions/cryptos')
+        cryptos.value = responseCryptos.data
+
+        //2. cargar estado para mostrar saldo disponible a la hora de vender
+        const responseEstado = await axios.get('https://localhost:7233/api/Transactions/estado');
+        estado.value = responseEstado.data.cryptos;
+        
+        //3. si hay id, es edicion
+        if(route.params.id){
+            editando.value = true
+            const cryptoResponse = await axios.get(`https://localhost:7233/api/Transactions/${route.params.id}`)
+                accion.value = cryptoResponse.data.action
+                cryptoSeleccionada.value = cryptoResponse.data.cryptoCode
+                cantidadCrypto.value = cryptoResponse.data.cryptoAmount
+        }
+
+
+
+    }catch(error){
+        alert("Error al cargar los datos!"+ error.message)
     }
 })
 
-onMounted(async () => {
-
-        const response = await axios.get('https://localhost:7233/api/Transactions/estado');
-
-        estado.value = response.data.cryptos;
-
-        console.log("Estado cargado:", estado.value);
-});
 
 watch(cryptoSeleccionada, async (nuevaCrypto) =>{
     if(!nuevaCrypto)return;
@@ -185,6 +211,10 @@ h3{
     padding: 20px 0px 5px 0px;
     font-size: 15px;
 }
+h1{
+    margin-top: 10px;
+    margin-left: 8px;
+}
 .inputForm{
     grid-area: input;
     width: 100%;
@@ -241,7 +271,8 @@ h3{
     font-size: 15px;
     font-weight: 500;
     display: inline-block;
-    width: 50%;
+    width: 100%;
+    max-width: 280px;
 
 }
 </style>

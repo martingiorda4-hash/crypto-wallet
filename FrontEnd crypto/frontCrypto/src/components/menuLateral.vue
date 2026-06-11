@@ -22,7 +22,7 @@ import {
       </div>
 
       <div class="btnDashboard">
-        <RouterLink to="/" class="btn">
+        <RouterLink to="/Dashboard" class="btn">
           <div class="contenedor-icono"><HomeIcon class="icon"/></div>
           <span>Inicio</span>
         </RouterLink>

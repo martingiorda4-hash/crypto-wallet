@@ -6,11 +6,21 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'Login',
+      component: () => import('../components/Login.vue'),
+    },
+    {
+      path: '/Dashboard',
       component: () => import('../components/PaginaPrincipal.vue'),
     },
     {
       path: '/Operaciones',
       name: 'Operaciones',
+      component: () => import('../components/NuevaTransaction.vue'),
+    },
+    {
+      path: '/Operaciones/:id',
+      name: 'OperacionesEditar',
       component: () => import('../components/NuevaTransaction.vue'),
     },
     {
