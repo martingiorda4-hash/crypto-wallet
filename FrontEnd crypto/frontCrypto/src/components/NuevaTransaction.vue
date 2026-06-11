@@ -1,7 +1,7 @@
 <template>
     <div class="container">
-            <h1>{{ editando ? 'Actualización de transaccion' : 'Nueva transacción' }}</h1>
-            <form class="form" @submit.prevent="CrearTransaccion">
+            <h1 class="titulo-principal">{{ editando ? 'Actualización de transaccion' : 'Nueva transacción' }}</h1>
+            <form class="form" @submit.prevent="CrearTransaccion()">
                 <h3 class="titulo">Datos de la transaccion</h3>
             <div class="input">
                 <h3>Acción</h3>
@@ -13,7 +13,7 @@
             </div>
             <div class="input">
                 <h3>Criptomoneda</h3>
-                <select class="inputForm" v-model="cryptoSeleccionada" required>
+                <select class="inputForm" v-model="cryptoSeleccionada" @change="obtenerPrecio" required>
                     <option value="">Seleccione una criptomoneda</option>
                     <option v-for="crypto in cryptos" :key="crypto.id" :value="crypto.code" >
                         {{ crypto.name }}   
@@ -41,25 +41,37 @@
 
                 <p v-if="loading">Consultando precio...</p>
                 <div class="botones">
-                    <button  v-if="!esitando && accion === 'purchase' && !loading" type="submit">Comprar</button>
-                    <button  v-if="!editando && accion === 'sale' && !loading" type="submit">Vender</button>
-                    <button v-if="editando && !loading" type="submit">Guardar cambios</button>
+                    <button  v-if="!editando && accion === 'purchase' && !loading" type="submit" class="btn-compra">
+                        Comprar
+                    </button>
+                    <button  v-if="!editando && accion === 'sale' && !loading" type="submit" class="btn-venta">
+                        Vender
+                    </button>
                 </div>
-
+                
             </form>
             <p v-if="exito" style="color: green;">{{ exito }}</p>
         </div>
+        <div class="accionEditar">
+            <button class="btn-guardarCambios" v-if="editando && !loading" @click="editarTransaccion()">Guardar cambios</button>
+        </div>
+        <div class="accionCancelar">
+            <button class="btn-Cancelar" v-if="editando && !loading" @click="router.push('/Historial')">Cancelar</button>
+        </div>
+            
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
-import { watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const editando = ref(false)
 const route = useRoute()
 const accion = ref('')
+const fecha = ref('')
 const cryptos = ref([])
 const cryptoSeleccionada = ref('')
 const cantidadCrypto = ref(0)
@@ -71,27 +83,15 @@ const estado = ref([])
 const disponible = computed(() => { 
     if(!estado.value || !estado.value.length)return 0;
 
-    const seleccionado = cryptoSeleccionada.value.trim().toLocaleLowerCase();
-
     const encontrado = estado.value.find(c => c.cryptoCode.toLocaleLowerCase() === cryptoSeleccionada.value.toLocaleLowerCase());
-
-    return encontrado ? encontrado.cantidad : 0;
+    
+    if(encontrado){
+        return encontrado.cantidad
+    }else{
+        
+        return 0;
+    }
 });
-
-// Verifica si está con un rol, sino lo renderiza al componente login
-onMounted(async () => {
-        const role = localStorage.getItem("role")
-
-    if(!role){
-        router.push("/")
-    }
-    })
-//verifica si recibe id para que cambie el titulo en base a si esta editando o creando
-onMounted(async () => {
-    if(route.params.id){
-        editando.value = true
-    }
-})
 const CrearTransaccion = async () => {
     if(!accion.value || !cryptoSeleccionada.value || !cantidadCrypto.value){
         alert('Por favor complete todos los campos')
@@ -128,23 +128,49 @@ const CrearTransaccion = async () => {
         loading.value = false
     }
 }
+const editarTransaccion = async () =>{
+    try{
+        
+        exito.value = null
+        const response = await axios.patch(`https://localhost:7233/api/Transactions/${route.params.id}`,{
+            action: accion.value,
+            cryptoCode: cryptoSeleccionada.value,
+            cryptoAmount: parseFloat(cantidadCrypto.value),
+            money: precio.value ? parseFloat(total.value) : 0,
+            dateTime: fecha.value
+        })
+        alert("Transacción editada exitosamente")+ response.data
+        router.push('/Historial')
+    }catch(error){
+        alert("Error al editar una transacción"+ error.message)
+    }
+}
 onMounted(async () =>{
     try{
-        //1. cargar las cryptos en el select
+        //1. Verifica si está con un rol, sino lo manda al componente login
+        const role = localStorage.getItem("role")
+
+        if(!role){
+            router.push("/")
+            return
+        }
+
+        //3. cargar las cryptos en el select
         const responseCryptos = await axios.get('https://localhost:7233/api/Transactions/cryptos')
         cryptos.value = responseCryptos.data
 
-        //2. cargar estado para mostrar saldo disponible a la hora de vender
+        //4. cargar estado para mostrar saldo disponible a la hora de vender
         const responseEstado = await axios.get('https://localhost:7233/api/Transactions/estado');
         estado.value = responseEstado.data.cryptos;
         
-        //3. si hay id, es edicion
+        //5. si hay id, es edicion
         if(route.params.id){
             editando.value = true
             const cryptoResponse = await axios.get(`https://localhost:7233/api/Transactions/${route.params.id}`)
                 accion.value = cryptoResponse.data.action
                 cryptoSeleccionada.value = cryptoResponse.data.cryptoCode
                 cantidadCrypto.value = cryptoResponse.data.cryptoAmount
+                fecha.value = cryptoResponse.data.dateTime
         }
 
 
@@ -154,39 +180,25 @@ onMounted(async () =>{
     }
 })
 
-
-watch(cryptoSeleccionada, async (nuevaCrypto) =>{
-    if(!nuevaCrypto)return;
-
-    try{
-        loading.value =true;
-
-        const response = await axios.get(`https://localhost:7233/api/Transactions/precio/${nuevaCrypto}`);
-        
-        console.log("Respuesta API:", response.data);
-
-        precio.value = parseFloat(response.data.precio);
-
-        console.log("Precio guardado:", precio.value);
-    }catch(error){
-        alert("Error al obtener precio"+ error.message);
-    }
-    finally{
-        loading.value = false;
-    }
-});
+const obtenerPrecio = async () =>{
+    if(!cryptoSeleccionada.value)return
+    const response = await axios.get(`https://localhost:7233/api/Transactions/precio/${cryptoSeleccionada.value}`);
+    precio.value = parseFloat(response.data.precio)
+}
 
 </script>
 
 
 
 <style scoped>
+.titulo-principal{
+    color: #DBDDE7;
+}
 .container{
     padding: 40px;
 }
 form {
     width: 60%;
-    height: 90;
     border: 3px solid #293643;
     border-radius: 10px;
     background-color: #1a252d;
@@ -202,6 +214,7 @@ form {
 .titulo{
     font-size: 25px;
     margin-left: 20px;
+    
 }
 h3{
     grid-area: texto;
@@ -238,12 +251,24 @@ h1{
     padding: 10px;
     border-radius: 10px;
     color: white;
-    background-color: #1050B8;
+    /* background-color: #1050B8; */
     border: none;
     cursor: pointer;
     font-size: 1rem;
     margin-left: 19px;
     
+}
+.btn-compra{
+    background-color: #16A34A;
+}
+.btn-compra:hover{
+    background-color: #15803D;
+}
+.btn-venta{
+    background-color: #DC2626;
+}
+.btn-venta:hover{
+    background-color: #B91C1C;
 }
 .inputForm:invalid{
     color: #8a9bb0;
@@ -275,4 +300,44 @@ h1{
     max-width: 280px;
 
 }
+.accionEditar{
+    
+    width: 60%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -30px;
+
+}
+.btn-guardarCambios{
+    max-width: 250px;
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    background-color: #1050B8;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    height: 40px;
+}
+.accionCancelar{
+    width: 60%;
+    display: flex;
+    justify-content: flex-start;
+    margin-top: -40px;
+    margin-left: 39px;
+}   
+.btn-Cancelar{
+    background-color: #293643;
+    color: white;
+    width: 100px;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    height: 40px;
+}
+
+
 </style>

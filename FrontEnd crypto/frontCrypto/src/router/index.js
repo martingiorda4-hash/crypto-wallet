@@ -33,6 +33,11 @@ const router = createRouter({
       name: 'EstadoActual',
       component: () => import('../components/EstadoActual.vue'),
     },
+    {
+      path: '/Detalle/:id',
+      name: 'Detalle',
+      component: () => import('../components/DetalleTransactions.vue'),
+    },
   ],
 })
 

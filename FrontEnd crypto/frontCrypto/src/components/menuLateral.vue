@@ -24,7 +24,7 @@ import {
       <div class="btnDashboard">
         <RouterLink to="/Dashboard" class="btn">
           <div class="contenedor-icono"><HomeIcon class="icon"/></div>
-          <span>Inicio</span>
+          <span>Dashboard</span>
         </RouterLink>
       </div>
 
@@ -48,13 +48,6 @@ import {
           <span>Estado Actual</span>
         </RouterLink>
       </div>
-
-      <div class="btnDashboard">
-        <button class="btn" id="btnSalir">
-          <div class="contenedor-icono"><ArrowLeftStartOnRectangleIcon/></div>
-          <span>Salir</span>
-        </button>
-      </div>
     </div>
 <div class="contendor-form">
     <RouterView />
@@ -69,7 +62,7 @@ import {
     }
 
     .contenedor-general{
-        height: 100vh;
+        min-height: 100vh;
         display: grid;
         grid-template-areas: 'dashboard form';
         grid-template-columns: 20% auto;

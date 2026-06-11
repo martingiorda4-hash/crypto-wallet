@@ -8,14 +8,14 @@
         <span class="input-group-text">
             <UserIcon class="icon"/>
         </span>
-        <input type="text" id="username" class="form-control login" placeholder="Usuario">
+        <input type="text" v-model="username" class="form-control login" placeholder="Usuario">
         </div>
 
         <div class="input-group">
         <span class="input-group-text">
             <LockClosedIcon class="icon"/>
         </span>
-        <input type="password" id="clave" class="form-control login" placeholder="Contraseña">
+        <input type="password" v-model="clave" class="form-control login" placeholder="Contraseña">
         </div>
 
         <button class="btn-primary" type="button" @click="login">
@@ -30,25 +30,25 @@
 <script setup>
 import { UserIcon, LockClosedIcon } from '@heroicons/vue/24/solid'
 import { useRouter } from 'vue-router';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 const router = useRouter()
+const username = ref('')
+const clave = ref('')
 
 const login = () => {
-    const username = document.getElementById("username").value
-    const password = document.getElementById("clave").value
     
     //Validacion
-    if(!username || !password){
+    if(!username.value || !clave.value){
         alert("Todos los campos son obligatorios")
         return
     }
 
-    if(username === "martin.giorda" && password === "martinAdmin"){
+    if(username.value === "Martin Giorda" && clave.value === "Admin"){
         localStorage.setItem("role", "admin")
-        localStorage.setItem("username", username)
+        localStorage.setItem("username", username.value)
     }else{
         localStorage.setItem("role", "user")
-        localStorage.setItem("username", username)
+        localStorage.setItem("username", username.value)
     }
 
     router.push('/Dashboard')

@@ -43,6 +43,9 @@
 import axios from 'axios';
 import {ref} from 'vue';
 import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 const estado = ref([])
 const totalPesos = ref(0)
 const nombreCrypto = (code) => {
@@ -56,6 +59,11 @@ const nombreCrypto = (code) => {
 }
 
 onMounted(async () => {
+    const role = localStorage.getItem("role")
+    if(!role){
+        router.push('/')
+        return
+    }
     try{
         
         const response = await axios.get('https://localhost:7233/api/Transactions/estado');
@@ -78,12 +86,12 @@ onMounted(async () => {
 .card {
     padding: 20px;
     max-width: 800px;
-    margin: 40px 0;
+    margin: 10px 0;
 }
 .titulo-principal{
     margin-top: 20px;
-    margin-bottom: 15px;
-    margin-left: 15px;
+    margin-bottom: 5px;
+    margin-left: 20px;
     font-size: 30px;
     color: #DBDDE7;
 }

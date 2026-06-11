@@ -1,8 +1,8 @@
 <template>
     <div class="contendedor-usuario">
         <div class="logoUsuario">
+            {{ role }}
             <UserIcon class="iconUser"></UserIcon>
-            {{ nombreUsuario }}  ({{ role }})
             <button class="btn-cerrarSesion" type="button" @click="cerrarSesion">
                 Cerrar sesión
             </button>
@@ -11,7 +11,8 @@
     </div>
     <div class="dashboard-contenedor">
         <h1 class="titulo">Dashboard</h1>
-        <h3 class="titulo">Bienvenido a tu billetera virtual</h3>
+        <h3 class="subtitulo">¡Bienvenido, {{ nombreUsuario }}!</h3>
+        <p class="descripcion">Resumen general</p>
 
         <div class="tarjetas">
             <RouterLink to="/Operaciones" class="tarjeta">
@@ -66,6 +67,7 @@ const nombreUsuario = ref('')
 
 const cerrarSesion = () => {
     localStorage.removeItem("role")
+    localStorage.removeItem("username")
     router.push("/")
 }
 
@@ -74,8 +76,15 @@ const cerrarSesion = () => {
     const totalCartera = ref(0);
 
     onMounted(async () =>{
+        role.value = localStorage.getItem("role")
+        nombreUsuario.value = localStorage.getItem("username")
+        
+        if(!role.value){
+            router.push("/")
+            return
+        }
+        
         try{
-
             const response = await axios.get('https://localhost:7233/api/Transactions/dashboard')
             totalCartera.value = response.data.totalCartera;
             cantidadTransacciones.value = response.data.cantidadTransacciones;
@@ -85,27 +94,41 @@ const cerrarSesion = () => {
         
 
     })  
-    onMounted(async () => {
-        role.value = localStorage.getItem("role")
-        nombreUsuario.value = localStorage.getItem("username")
-
-    if(!role.value){
-        router.push("/")
-    }
-    })
     </script>
 
 
 
     <style scoped>
     .titulo{
-        margin-left: 50px;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    animation: aparecer 0.8s ease-out;
+    }
+    @keyframes aparecer{
+        from{
+            opacity: 0;
+            transform: translateY(-15px);
+        }
+        to{
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .subtitulo{
+        font-size: 1.5rem;
+    color: #DBDDE7;
+    margin-bottom: 5px;
+    }
+    .descripcion{
+        color: #8a9bb0;
+        font-size: 1rem;
     }
     .tarjetas{
         display: grid;
         grid-template-columns: repeat(3,180px);
         gap: 20px;
-        margin-top: 30px;
+        margin-top: 10px;
     }
     .icon{
         width: 40px;
@@ -116,6 +139,7 @@ const cerrarSesion = () => {
     .dashboard-contenedor{
         padding: 40px;
         color: #dbdde7;
+        
         
     }
 

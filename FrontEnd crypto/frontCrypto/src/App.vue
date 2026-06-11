@@ -13,7 +13,6 @@ const route = useRoute()
 
   <div v-else>
     <menuLateral/>
-    <RouterView/>
   </div>
 
 </template>

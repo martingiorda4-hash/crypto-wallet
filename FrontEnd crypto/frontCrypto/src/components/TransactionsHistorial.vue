@@ -1,6 +1,6 @@
 <template>
     <div>
-    <h1 style="margin-top: 10px; margin-left: 8px;">Historial de movimientos</h1>
+    <h1 class="titulo-principal">Historial de movimientos</h1>
     <table class="table-transacciones">
     <thead>
         <tr>
@@ -23,11 +23,11 @@
             </td>
 
 
-            <td>{{ transaction.cryptoCode }}</td>
+            <td>{{ nombreCrypto(transaction.cryptoCode) }} ({{ transaction.cryptoCode.toUpperCase()}})</td>
             <td>{{ transaction.cryptoAmount }}</td>
             <td>{{ transaction.money.toLocaleString('es-AR', {style: 'currency', currency: 'ARS'})}}</td>
             <td>
-            <button  id="ver" @click="verTransaccion(transaction.id)">
+            <button  id="ver" @click="router.push(`/Detalle/${transaction.id}`)">
                 <i class="fa-solid fa-eye"></i>
             </button>
             <button v-if="role === 'admin'" id="editar" @click="router.push(`/Operaciones/${transaction.id}`)">
@@ -70,27 +70,34 @@ const mostrarModal = ref(false)
 const transaccionEliminar = ref(null)
 const exito = ref(null)
 
+const nombreCrypto = (code) => {
+    if(code === 'btc') return 'Bitcoin'
+    if(code === 'eth') return 'Ethereum'
+    if(code === 'usdc')return 'USDC'
+    if(code === 'sol')return 'Solana'
+    if(code === 'ada')return 'Cardano'
+
+    return code.toUpperCase()
+}
+
 onMounted(async () => {
+    role.value = localStorage.getItem("role")
+
+    if(!role.value){
+        router.push("/")
+        return
+    }
+
     loading.value= true
     try{
         const response = await axios.get('https://localhost:7233/api/Transactions')
         movimientos.value = response.data
     } catch (error) {
         alert('Error al cargar los movimientos:', error)
-        setTimeout(() => {
-            exito.value = ''
-        }, 5000)
     } finally {
         loading.value = false
     }
 })
-onMounted(async () => {
-    role.value = localStorage.getItem("role")
-
-    if(!role){
-        router.push("/")
-    }
-    })
 const abrirModal = (id) => {
     transaccionEliminar.value = id
     mostrarModal.value = true
@@ -103,6 +110,9 @@ const confirmarEliminar = async () => {
         movimientos.value =response.data
         mostrarModal.value = false
         exito.value = 'Transacción eliminada exitosamente.'
+        setTimeout(() => {
+            exito.value = ''
+        }, 5000)
     } catch (error) {
         alert('Error al eliminar la transaccion:', error)
     }
@@ -115,6 +125,11 @@ const cancelarEliminar = () => {
 </script>
 
 <style scoped>
+.titulo-principal{
+    color: #DBDDE7;
+    margin-top: 10px; 
+    margin-left: 8px;
+}
 .table-transacciones {
     width: 80%;
     border-collapse: collapse;
@@ -221,7 +236,7 @@ button#ver:hover{
 }
 ._modal{
     background-color: #1a1a2e;
-    border: 1px solid #FFD700;
+    border: 1px solid #ff4444;
     padding: 30px;
     border-radius: 10px;
     text-align: center;
