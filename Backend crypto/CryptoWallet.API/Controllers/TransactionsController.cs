@@ -41,7 +41,7 @@ namespace CryptoWallet.API.Controllers
                 {
                     return BadRequest("Los datos no pueden ser nulos ni la cantidad menor a 0");
                 }
-                //Validacion de saldo para ventas
+                
                 if (transactionDto.Action == "sale")
                 {
                     var totalComprado = _context.transactions.
@@ -59,29 +59,29 @@ namespace CryptoWallet.API.Controllers
                     }
                 }
 
-                //Consultamos a CryptoYa
+                //Consulta a CryptoYa
                 string url = $"https://criptoya.com/api/satoshitango/{transactionDto.CryptoCode}/ars";
                 string response = await _httpClient.GetStringAsync(url);
                
 
-                //Deserializar la respuesta de CryptoYa. Convierto un string JSON en un objeto C# para poder usar sus valores.
+                
                 var cryptoYaData = JsonSerializer.Deserialize<CryptoYaResponse>(response);
 
-                //Calcular el monto segun si es compra o venta
+                
                 decimal precio;
                 if (transactionDto.Action == "purchase")
                 {
-                    precio = (decimal)cryptoYaData.TotalAsk; //si es compra, uso TotalAsk
+                    precio = (decimal)cryptoYaData.TotalAsk; 
                 }
                 else
                 {
-                    precio = (decimal)cryptoYaData.TotalBid; //si es venta, uso TotalBid
+                    precio = (decimal)cryptoYaData.TotalBid; 
                 }
 
                 decimal money = transactionDto.CryptoAmount * precio;
 
 
-                //Crear y guardar la transacción en la base de datos.
+                
 
                 var transaction = new CryptoTransaction
                 {
@@ -199,38 +199,35 @@ namespace CryptoWallet.API.Controllers
                 }
 
                 var estado = _context.transactions.Include(t => t.Crypto).Include(t => t.TransactionAction).GroupBy(t => t.CryptoId).ToList();
-                var lista = new List<dynamic>(); //lista dinamica para almacenar objetos anonimos con cryptoCode y cantidad y poder usarlo en el otro foreach.
+                var lista = new List<dynamic>(); 
                 foreach (var item in estado)
                 {
                     var totalComprado = item.Where(t => t.TransactionAction.Name == "purchase").Sum(t => t.CryptoAmount);
                     var totalVendido = item.Where(t => t.TransactionAction.Name == "sale").Sum(t => t.CryptoAmount);
                     var cantidad = totalComprado - totalVendido;
 
-                    //Filtro por los que tienen saldo
+                  
                     if (cantidad > 0)
                     {
                         lista.Add(new
                         {
-                            CryptoCode = item.First().Crypto.Code, //tomo la primera para acceder al objeto Crypto y obtener su código
+                            CryptoCode = item.First().Crypto.Code, 
                             Cantidad = cantidad
                         });
                     }
                 }
 
 
-                //Consultamos a CryptoYa el valor actual para calcular el valor total en pesos.
 
-                var resultados = new List<object>(); //Lista para almacenar los resultados individuales de cada crypto,
-                                                     //recorrerlos mediante el foreach y luego mostrarlos
+                var resultados = new List<object>();
                 decimal totalPesos = 0;
 
-                //Recorro cada crypto para consultar su valor actual(uso foreach porque cada crypto es una llamada distina a la API)
+                
                 foreach (var item in lista)
                 {
                     string url = $"https://criptoya.com/api/satoshitango/{item.CryptoCode}/ars";
                     string response = await _httpClient.GetStringAsync(url);
 
-                    //Deserializar la respuesta de CryptoYa
                     var cryptoYaData = JsonSerializer.Deserialize<CryptoYaResponse>(response);
 
                     decimal valorPesos = item.Cantidad * (decimal)cryptoYaData.TotalBid;
