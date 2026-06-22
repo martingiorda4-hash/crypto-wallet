@@ -22,9 +22,9 @@
 
                 <div v-if="accion === 'sale' && cryptoSeleccionada" class="disponible">
                     Disponible: {{ disponible }} {{ cryptoSeleccionada }}
-
                 </div>
             </div>
+
             <div class="input">
                 <h3>Cantidad</h3>
                 <input class="inputForm" v-model="cantidadCrypto" type="number" step="0.00000001" placeholder="0.00"/>
@@ -81,8 +81,9 @@ const exito = ref(null)
 const loading = ref(false)
 const estado = ref([])
 const disponible = computed(() => { 
-    if(!estado.value || !estado.value.length)return 0;
-
+    if(!estado.value || !estado.value.length){
+        return 0;
+    }
     const encontrado = estado.value.find(c => c.cryptoCode.toLocaleLowerCase() === cryptoSeleccionada.value.toLocaleLowerCase());
     
     if(encontrado){
@@ -107,6 +108,21 @@ const CrearTransaccion = async () => {
     }
     loading.value = true
     try{
+
+        if(accion.value === 'purchase'){
+            const usuario = localStorage.getItem("username")
+            const saldoActual = parseFloat(localStorage.getItem(`saldo ${usuario}`)) || 0
+            const total = parseFloat(cantidadCrypto.value) * parseFloat(precio.value)
+
+            if(saldoActual < total){
+                alert(`No tienes suficiente saldo. Saldo actual: ${saldoActual.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}`)
+                loading.value = false
+                return
+            }
+
+            localStorage.setItem(`saldo ${usuario}`, saldoActual - total)
+        }
+
         const response = await axios.post('https://localhost:7233/api/Transactions', {
             action: accion.value,
             cryptoCode: cryptoSeleccionada.value,
@@ -131,6 +147,18 @@ const CrearTransaccion = async () => {
 const editarTransaccion = async () =>{
     try{
         
+        if(!accion.value || !cryptoSeleccionada.value){
+            alert('Por favor complete todos los campos')
+            return
+        }
+        if(accion.value === 'sale' && total.value <= 0){
+            alert('Monto inválido')
+            return
+        }
+        if(parseFloat(cantidadCrypto.value) <= 0){
+            alert('La cantidad de crypto debe ser mayor a 0')
+            return
+        }
         exito.value = null
         const response = await axios.patch(`https://localhost:7233/api/Transactions/${route.params.id}`,{
             action: accion.value,
@@ -139,7 +167,7 @@ const editarTransaccion = async () =>{
             money: precio.value ? parseFloat(total.value) : 0,
             dateTime: fecha.value
         })
-        alert("Transacción editada exitosamente")+ response.data
+        alert("Transacción editada exitosamente"+ response.data)
         router.push('/Historial')
     }catch(error){
         alert("Error al editar una transacción"+ error.message)
@@ -162,7 +190,7 @@ onMounted(async () =>{
         //4. cargar estado para mostrar saldo disponible a la hora de vender
         const responseEstado = await axios.get('https://localhost:7233/api/Transactions/estado');
         estado.value = responseEstado.data.cryptos;
-        
+
         //5. si hay id, es edicion
         if(route.params.id){
             editando.value = true
@@ -171,6 +199,8 @@ onMounted(async () =>{
                 cryptoSeleccionada.value = cryptoResponse.data.cryptoCode
                 cantidadCrypto.value = cryptoResponse.data.cryptoAmount
                 fecha.value = cryptoResponse.data.dateTime
+
+                await obtenerPrecio()
         }
 
 

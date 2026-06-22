@@ -50,8 +50,8 @@
     <div v-if="mostrarModal" class="modal">
         <div class="_modal">
             <p>¿Estás seguro de que quieres eliminar esta transacción?</p>
-            <button id="modaleliminar" @click="confirmarEliminar">Eliminar</button>
             <button id="modalcancelar" @click="cancelarEliminar">Cancelar</button>
+            <button id="modaleliminar" @click="confirmarEliminar">Eliminar</button>
         </div>
     </div>
 </template>

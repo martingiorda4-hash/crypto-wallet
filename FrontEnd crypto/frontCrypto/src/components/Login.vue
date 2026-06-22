@@ -21,7 +21,7 @@
         <button class="btn-primary" type="button" @click="login">
             Ingresar
         </button>
-
+        <p v-if="mensaje" style="color: red;">{{ mensaje }}</p>
     </form>
     </div>
 </div>
@@ -34,6 +34,7 @@ import { onMounted, ref } from 'vue';
 const router = useRouter()
 const username = ref('')
 const clave = ref('')
+const mensaje = ref(null)
 
 const login = () => {
     
@@ -43,7 +44,13 @@ const login = () => {
         return
     }
 
-    if(username.value === "Martin Giorda" && clave.value === "Admin"){
+    if(username.value === "admin" && clave.value !== "admin"){
+        mensaje.value =true
+        mensaje.value = "El usuario o contraseña son incorrectos."
+        return;
+    }
+
+    if(username.value === "admin" && clave.value === "admin"){
         localStorage.setItem("role", "admin")
         localStorage.setItem("username", username.value)
     }else{

@@ -46,11 +46,23 @@
                         <CurrencyDollarIcon class="iconEstadistica"></CurrencyDollarIcon>
                     </div>
 
-                    <span class="valor">{{ totalCartera.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }) }}</span>
+                    <span class="valor">{{ saldo.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }) }}</span>
+                    <button class="btn-Saldo" @click="mostrarModal = true"> + Cargar saldo</button>
                 </div>
             </div>
         </div>
         
+        <div v-if="mostrarModal" class="modalSaldo">
+            <div class="modal">
+                <h4>Cargar saldo</h4>
+                <input type="number" v-model="montoACargar" placeholder="Ingrese el monto" class="input-monto"/>
+                <div class="botones">
+                    <button class="btn-cancelar" @click="mostrarModal = false">Cancelar</button>
+                    <button class="btn-confirmar" @click="cargarSaldo">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
     </template>
 
     <script setup>
@@ -65,6 +77,13 @@ const router = useRouter()
 const role = ref('')
 const nombreUsuario = ref('')
 
+const saldo = ref(0)
+const mostrarModal = ref(false)
+const montoACargar = ref('')
+
+
+
+
 const cerrarSesion = () => {
     localStorage.removeItem("role")
     localStorage.removeItem("username")
@@ -78,6 +97,9 @@ const cerrarSesion = () => {
     onMounted(async () =>{
         role.value = localStorage.getItem("role")
         nombreUsuario.value = localStorage.getItem("username")
+
+        const usuario = localStorage.getItem("username")
+        saldo.value = parseFloat(localStorage.getItem(`saldo ${usuario}`)) || 0
         
         if(!role.value){
             router.push("/")
@@ -94,6 +116,21 @@ const cerrarSesion = () => {
         
 
     })  
+
+    const cargarSaldo = () => {
+        const monto = parseFloat(montoACargar.value)
+
+        if(!monto || monto  <= 0){
+            alert("Monto inválido. Debe ingresar un monto mayor a 0");
+            return;
+        }
+        const usuario = localStorage.getItem("username")
+        const nuevoSaldo = saldo.value + monto
+        localStorage.setItem(`saldo ${usuario}`, nuevoSaldo)
+        saldo.value = nuevoSaldo
+        montoACargar.value = ''
+        mostrarModal.value = false
+    }
     </script>
 
 
@@ -103,17 +140,6 @@ const cerrarSesion = () => {
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 10px;
-    animation: aparecer 0.8s ease-out;
-    }
-    @keyframes aparecer{
-        from{
-            opacity: 0;
-            transform: translateY(-15px);
-        }
-        to{
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
     .subtitulo{
         font-size: 1.5rem;
@@ -210,7 +236,7 @@ const cerrarSesion = () => {
     }
     .valor{
         color:#BBDDE7;
-        font-size: 28px;
+        font-size: 25px;
         font-weight: bold;
         margin-top: 10px;
     }
@@ -247,4 +273,89 @@ const cerrarSesion = () => {
     .btn-cerrarSesion:active{
         transform: translateY(0);
     }
+    .modalSaldo{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgb(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+    }
+    .modal{
+        background: #1e1e2e;
+        padding: 2rem;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        min-width: 300px;
+    }
+    .botones{
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        justify-content: flex-start;
+    }
+        
+    .btn-confirmar{
+        background-color: red;
+        width: 100%;
+        max-width: 280px;
+        padding: 10px 20px;
+        border-radius: 10px;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+
+    }
+        
+    .btn-cancelar{
+        background-color: #293643;;
+        width: 100%;
+        max-width: 280px;
+        padding: 10px 20px;
+        border-radius: 10px;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    
+    }
+    .input-monto{
+    grid-area: input;
+    width: 100%;
+    max-width: 280px;
+    font-size: 15px;
+    padding: 10px;
+    background-color: #0C131A;
+    border: 2px solid #293643;
+    outline: none;
+    color: #DBDDE7;
+    border-radius: 5px;
+    }
+    .btn-Saldo{
+        margin-top: 10px;
+        background-color: green;
+        width: auto;
+        max-width: 190px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 0.85rem;
+        margin-left: 19px;
+        display: inline-block;
+        align-self: flex-start;
+        transition: transform 0.2s ease;
+    }
+    .btn-Saldo:hover{
+        transform: translateY(-5px);
+    }
+
     </style>
