@@ -27,6 +27,27 @@ namespace CryptoWallet.API.Controllers
             var cryptos = _context.cryptos.ToList();
             return Ok(cryptos);
         }
+
+        [HttpGet("precio/{crypto}")]
+        public async Task<IActionResult> GetPrecio(string crypto)
+        {
+            //Consulta a CryptoYa
+            string url = $"https://criptoya.com/api/satoshitango/{crypto}/ars";
+            string response = await _httpClient.GetStringAsync(url);
+
+
+           
+            var cryptoYaData = JsonSerializer.Deserialize<CryptoYaResponse>(response);
+
+          
+            decimal precio = (decimal)cryptoYaData.TotalBid;
+
+            return Ok(new
+            {
+                Precio = precio
+            });
+        }
+
         //COMPRA Y VENTA DE CRIPTOMONEDA
         [HttpPost]
         public async Task<IActionResult> CreateTransaction([FromBody] TransactionDto transactionDto)
@@ -41,7 +62,7 @@ namespace CryptoWallet.API.Controllers
                 {
                     return BadRequest("Los datos no pueden ser nulos ni la cantidad menor a 0");
                 }
-                
+                //Validacion de saldo para ventas
                 if (transactionDto.Action == "sale")
                 {
                     var totalComprado = _context.transactions.
@@ -59,7 +80,7 @@ namespace CryptoWallet.API.Controllers
                     }
                 }
 
-                //Consulta a CryptoYa
+               
                 string url = $"https://criptoya.com/api/satoshitango/{transactionDto.CryptoCode}/ars";
                 string response = await _httpClient.GetStringAsync(url);
                
@@ -81,7 +102,6 @@ namespace CryptoWallet.API.Controllers
                 decimal money = transactionDto.CryptoAmount * precio;
 
 
-                
 
                 var transaction = new CryptoTransaction
                 {
@@ -125,7 +145,7 @@ namespace CryptoWallet.API.Controllers
 
         //DETALLE DE TRANSACCION
         [HttpGet("{id}")]
-        public IActionResult GetTransactionById(int id)
+        public IActionResult GetTransactionId(int id)
         {
             var transaction = _context.transactions.Include(t => t.TransactionAction).Include(t => t.Crypto).FirstOrDefault(t => t.Id == id);
             if (transaction == null)
@@ -186,6 +206,23 @@ namespace CryptoWallet.API.Controllers
             _context.SaveChanges();
             return Ok(new { estado = "Ok" });
         }
+        //ENDOPOINT PARA EL DASHBOARD PRINCIPAL
+        [HttpGet("dashboard")]
+        public IActionResult Dashboard()
+        {
+            var transacciones = _context.transactions.ToList();
+
+            var cantidadTransacciones = transacciones.Count();
+
+            var totalCartera = transacciones.Sum(e => e.Money);
+
+            return Ok(new
+            {
+                totalCartera = totalCartera,
+                cantidadTransacciones = cantidadTransacciones
+            });
+        }
+
 
         //ESTADO ACTUAL DE LA CARTERA
         [HttpGet("estado")]
@@ -199,17 +236,17 @@ namespace CryptoWallet.API.Controllers
                 }
 
                 var estado = _context.transactions.Include(t => t.Crypto).Include(t => t.TransactionAction).GroupBy(t => t.CryptoId).ToList();
-                var lista = new List<dynamic>(); 
+                var lista = new List<CryptoEstadoDto>();
                 foreach (var item in estado)
                 {
                     var totalComprado = item.Where(t => t.TransactionAction.Name == "purchase").Sum(t => t.CryptoAmount);
                     var totalVendido = item.Where(t => t.TransactionAction.Name == "sale").Sum(t => t.CryptoAmount);
                     var cantidad = totalComprado - totalVendido;
 
-                  
+                    
                     if (cantidad > 0)
                     {
-                        lista.Add(new
+                        lista.Add(new CryptoEstadoDto
                         {
                             CryptoCode = item.First().Crypto.Code, 
                             Cantidad = cantidad
@@ -219,21 +256,21 @@ namespace CryptoWallet.API.Controllers
 
 
 
-                var resultados = new List<object>();
+                var resultados = new List<CryptoEstadoDetalleDto>();
                 decimal totalPesos = 0;
 
-                
                 foreach (var item in lista)
                 {
                     string url = $"https://criptoya.com/api/satoshitango/{item.CryptoCode}/ars";
                     string response = await _httpClient.GetStringAsync(url);
 
+                  
                     var cryptoYaData = JsonSerializer.Deserialize<CryptoYaResponse>(response);
 
                     decimal valorPesos = item.Cantidad * (decimal)cryptoYaData.TotalBid;
                     totalPesos += valorPesos;
 
-                    resultados.Add(new
+                    resultados.Add(new CryptoEstadoDetalleDto
                     {
                         CryptoCode = item.CryptoCode,
                         Cantidad = item.Cantidad,

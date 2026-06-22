@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace CryptoWallet.API.Responses
 {
-  
+    
     public class CryptoYaResponse
     {
         [JsonPropertyName("ask")] 

@@ -17,6 +17,28 @@
         }
       }
     },
+    "/api/Transactions/precio/{crypto}": {
+      "get": {
+        "tags": [
+          "Transactions"
+        ],
+        "parameters": [
+          {
+            "name": "crypto",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Transactions": {
       "post": {
         "tags": [
@@ -134,6 +156,18 @@
               "format": "int32"
             }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Transactions/dashboard": {
+      "get": {
+        "tags": [
+          "Transactions"
         ],
         "responses": {
           "200": {

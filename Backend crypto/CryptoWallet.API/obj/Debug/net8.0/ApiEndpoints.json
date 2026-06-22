@@ -27,7 +27,7 @@
   },
   {
     "ContainingType": "CryptoWallet.API.Controllers.TransactionsController",
-    "Method": "GetTransactionById",
+    "Method": "GetTransactionId",
     "RelativePath": "api/Transactions/{id}",
     "HttpMethod": "GET",
     "IsController": true,
@@ -90,12 +90,38 @@
   },
   {
     "ContainingType": "CryptoWallet.API.Controllers.TransactionsController",
+    "Method": "Dashboard",
+    "RelativePath": "api/Transactions/dashboard",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CryptoWallet.API.Controllers.TransactionsController",
     "Method": "EstadoActual",
     "RelativePath": "api/Transactions/estado",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "CryptoWallet.API.Controllers.TransactionsController",
+    "Method": "GetPrecio",
+    "RelativePath": "api/Transactions/precio/{crypto}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "crypto",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   }
 ]
